@@ -47,7 +47,13 @@ public class FabricCut {
 		  
 		  System.out.println(result);
 		  
-		  
+		  Integer uniqueClaimId=null;
+		  for(Claim claim : inputStrings) {
+			  if (checkUniqueClaim(fabric, claim)) {
+				  uniqueClaimId=inputStrings.indexOf(claim)+1;
+				  System.out.println(uniqueClaimId);
+			  }
+		  }
 	}
 	
 	public static List<String> createBaseFabric() {
@@ -81,15 +87,6 @@ public class FabricCut {
 		
 	}
 	
-	public static void modifyFabric(List<String> fabric, Claim claim) {	
-		for(int i=0; i<claim.getToDown(); i++){	
-			String replace=createModifiedStringSlice(fabric.get(claim.getDown()+i).substring(claim.getLeft(), claim.getLeft()+claim.getToLeft()));
-			String toReplace = fabric.get(claim.getDown()+i).substring(0, claim.getLeft()) + replace + 
-					fabric.get(claim.getDown()+i).substring(claim.getLeft()+claim.getToLeft(), fabric.get(claim.getDown()+i).length());
-			fabric.set(claim.getDown()+i, toReplace);	
-		}
-	}
-	
 	public static Integer characterCount(String str, Character toCount) {
 		Integer count=0;
 		for(int i=0; i<str.length(); i++){
@@ -99,5 +96,26 @@ public class FabricCut {
 		}
 		return count;
 	}
+	
+	public static void modifyFabric(List<String> fabric, Claim claim) {	
+		for(int i=0; i<claim.getToDown(); i++){	
+			String replace=createModifiedStringSlice(fabric.get(claim.getDown()+i).substring(claim.getLeft(), claim.getLeft()+claim.getToLeft()));
+			String toReplace = fabric.get(claim.getDown()+i).substring(0, claim.getLeft()) + replace + 
+					fabric.get(claim.getDown()+i).substring(claim.getLeft()+claim.getToLeft(), fabric.get(claim.getDown()+i).length());
+			fabric.set(claim.getDown()+i, toReplace);	
+		}
+	}
+	
+	public static Boolean checkUniqueClaim(List<String> fabric, Claim claim) {
+        Boolean uniqueClaim=true;
+        Integer countChar=0;   
+        for(int i=0; i<claim.getToDown(); i++){
+            countChar+=characterCount(fabric.get(claim.getDown()+i).substring(claim.getLeft(), claim.getLeft()+claim.getToLeft()), 'X');                              
+        }
+        if (countChar>0) {
+            uniqueClaim=false;       
+        }
+        return uniqueClaim;
+}
 
 }
