@@ -20,7 +20,7 @@ import day3.Claim;
 public class PickAGuard {
 	public static void main(String[] args) throws IOException {
 
-		File file = new File("D://programozas//AdventOfCode//AdventOfCode2018//AOC2018//src//day4//input.txt"); 
+		File file = new File("D://programozas//AdventOfCode//AdventOfCode2018//AdventOfCode2018//src//day4//input.txt");
 		  
 		  BufferedReader br = new BufferedReader(new FileReader(file));  
 		  
@@ -51,11 +51,13 @@ public class PickAGuard {
 		String currentGuard=null;
 		LocalDateTime currentDate=null;
 		Boolean currentSleep=null;
+		LocalDateTime nextDate = null;
 		for(int i=0; i<inputStrings.size(); i++) {
 		  if (i<inputStrings.size()-1) {
 			    if (inputStrings.get(i).substring(19, 24).equals("Guard")) {
 			    	currentGuard=inputStrings.get(i).substring(inputStrings.get(i).indexOf("#")+1, 
-					  inputStrings.get(i).indexOf("#")+inputStrings.get(i).substring(inputStrings.get(i).indexOf("#")).indexOf(" "));
+					  inputStrings.get(i).indexOf("#")+inputStrings.get(i)
+							  .substring(inputStrings.get(i).indexOf("#")).indexOf(" "));
 					currentSleep=false;
 				} else if (inputStrings.get(i).substring(19, 24).equals("falls")) {
 					currentSleep=true;
@@ -65,11 +67,19 @@ public class PickAGuard {
 					System.out.println("What?");
 				}
 				currentDate=LocalDateTime.parse(inputStrings.get(i).substring(1, 17)+":00", formatter);
-				inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
-				while (currentDate.isBefore(LocalDateTime.parse(inputStrings.get(i+1).substring(1, 17)+":00", formatter))
-						&& currentDate.getMinute()<59) {
+			    nextDate=LocalDateTime.parse(inputStrings.get(i+1).substring(1, 17)+":00", formatter);
+			  if (currentDate.getHour()<1) {
+				  inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
+			  }
+				while (currentDate.plusMinutes(1).isBefore(nextDate)
+						&& ((currentDate.getHour()<1 && currentDate.getMinute()<59) || currentDate.getHour()==23)) {
 					currentDate=currentDate.plusMinutes(1);
-					inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
+					if (currentDate.getHour()<1) {
+						inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
+					} else {
+						continue;
+					}
+
 				}
 			} else if (i==inputStrings.size()-1) { 
 				String inputString=inputStrings.get(inputStrings.size()-1);
@@ -86,6 +96,10 @@ public class PickAGuard {
 					System.out.println("What?");
 				}
 				inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
+			  	while (currentDate.getHour()<1) {
+				  currentDate=currentDate.plusMinutes(1);
+				  inputActivities.add(new NightActivity(currentDate, currentGuard, currentSleep));
+			  	}
 			  } else {
 					System.out.println("What?");
 			  }	
